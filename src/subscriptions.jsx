@@ -1,23 +1,57 @@
-import { gql, useSubscription } from "@apollo/client";
+import { gql, useMutation, useSubscription } from "@apollo/client";
 
-const query = gql`
+const query_us = gql`
+  subscription turns {
+    turnsList(in: { limit: 50 }) {
+      operationType
+      turns {
+        id
+      }
+    }
+  }
+`;
+
+const query_them = gql`
   subscription {
-    numberIncremented
+    numberIncremented {
+      turns {
+        id
+      }
+      operationType
+    }
+  }
+`;
+
+const query_mut = gql`
+  mutation Mutation {
+    triggerEvent
   }
 `;
 
 export function Subscriptions() {
-  const { data, error, loading } = useSubscription(query);
-  if (loading) return <p>Loading...</p>;
+  const { data, error, loading } = useSubscription(query_us);
+  const [mut] = useMutation(query_mut);
+  console.log("data", data);
+
   return (
     <>
       <h3>Subscriptions</h3>
+      <button
+        onClick={() => {
+          mut().then(
+            (data) => console.log("mut data", data),
+            (err) => console.error("mut er", err)
+          );
+        }}
+      >
+        Call
+      </button>
+      {loading && <p>Loading...</p>}
       {error ? (
         <SubscriptionError />
       ) : (
         <>
           <h4>Response: </h4>
-          <p>Score: {data?.numberIncremented}</p>
         </>
       )}
     </>

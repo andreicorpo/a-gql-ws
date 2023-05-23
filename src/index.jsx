@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { createRoot } from "react-dom/client";
+import { render } from "react-dom";
 import {
   ApolloClient,
   ApolloProvider,
@@ -89,6 +90,7 @@ function App() {
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link,
+  onError: (err) => console.log("err", err),
 });
 
 const container = document.getElementById("root");
