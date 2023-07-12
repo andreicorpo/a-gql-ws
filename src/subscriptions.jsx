@@ -1,11 +1,18 @@
-import { gql, useMutation, useSubscription } from "@apollo/client";
+import { gql, useSubscription } from "@apollo/client";
+import { useEffect, useState } from "react";
 
 const query_us = gql`
   subscription turns {
-    turnsList(in: { limit: 50 }) {
+    turnsList(in: { limit: 100 }) {
       operationType
       turns {
         id
+        departure {
+          flightNo
+        }
+        arrival {
+          flightNo
+        }
       }
     }
   }
@@ -13,45 +20,34 @@ const query_us = gql`
 
 const query_them = gql`
   subscription {
-    numberIncremented {
-      turns {
-        id
-      }
-      operationType
-    }
+    numberIncremented
   }
 `;
 
-const query_mut = gql`
-  mutation Mutation {
-    triggerEvent
-  }
-`;
+export function Subscriptions({ useFailing }) {
+  const { data, error, loading } = useSubscription(
+    useFailing ? query_us : query_them
+  );
 
-export function Subscriptions() {
-  const { data, error, loading } = useSubscription(query_us);
-  const [mut] = useMutation(query_mut);
+  const [subEvents, setSubEvents] = useState([]);
+
+  useEffect(() => {
+    setSubEvents((old) => [...old, data]);
+  }, [data]);
   console.log("data", data);
 
   return (
     <>
       <h3>Subscriptions</h3>
-      <button
-        onClick={() => {
-          mut().then(
-            (data) => console.log("mut data", data),
-            (err) => console.error("mut er", err)
-          );
-        }}
-      >
-        Call
-      </button>
       {loading && <p>Loading...</p>}
       {error ? (
         <SubscriptionError />
       ) : (
         <>
           <h4>Response: </h4>
+          <code>
+            <pre>{JSON.stringify(subEvents, undefined, 2)}</pre>
+          </code>
         </>
       )}
     </>

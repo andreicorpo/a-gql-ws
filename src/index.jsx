@@ -87,9 +87,11 @@ function App() {
   );
 }
 
+const useFailing = true;
+
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link,
+  link: link(useFailing),
   onError: (err) => console.log("err", err),
 });
 
@@ -102,7 +104,10 @@ root.render(
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<App />} />
-          <Route path="subscriptions-wslink" element={<Subscriptions />} />
+          <Route
+            path="subscriptions-wslink"
+            element={<Subscriptions useFailing={useFailing} />}
+          />
         </Route>
       </Routes>
     </Router>
