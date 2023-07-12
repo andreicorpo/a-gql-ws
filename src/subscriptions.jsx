@@ -7,12 +7,6 @@ const query_us = gql`
       operationType
       turns {
         id
-        departure {
-          flightNo
-        }
-        arrival {
-          flightNo
-        }
       }
     }
   }
